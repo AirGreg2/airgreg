@@ -1,0 +1,46 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // Register GSAP plugins
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+    // Function to handle automatic scrolling
+    function setupScrollTrigger() {
+        // Define the trigger points and target scroll positions in percentages
+        const desktopTriggerPoints = [0.25, 0.43, 0.72];
+        const desktopTargetPoints = [0.42, 0.71, 0.869];
+        
+        const mobileTriggerPoints = [0.20, 0.40, 0.60]; // Example values for mobile
+        const mobileTargetPoints = [0.30, 0.50, 0.70]; // Example values for mobile
+
+        // Determine whether the device is mobile or not
+        const isMobile = window.innerWidth <= 991; // You can adjust the width as needed
+
+        // Use appropriate trigger points and target points based on the device type
+        const triggerPoints = isMobile ? mobileTriggerPoints : desktopTriggerPoints;
+        const targetPoints = isMobile ? mobileTargetPoints : desktopTargetPoints;
+
+        // Iterate through the trigger points and create ScrollTrigger instances
+        triggerPoints.forEach((triggerPoint, index) => {
+            ScrollTrigger.create({
+                trigger: document.body, // Use the body as the trigger element
+                start: `${triggerPoint * 100}% top`, // When the scroll position reaches the trigger point
+                onEnter: () => {
+                    // Scroll smoothly to the corresponding target point
+                    gsap.to(window, {
+                        scrollTo: targetPoints[index] * document.body.scrollHeight,
+                        duration: 5,
+                        ease: "linear"
+                    });
+                }
+            });
+        });
+    }
+
+    // Initialize the ScrollTrigger setup
+    setupScrollTrigger();
+
+    // Optional: Re-initialize on window resize to handle device orientation changes
+    window.addEventListener('resize', () => {
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill()); // Kill existing triggers
+        setupScrollTrigger(); // Re-setup triggers
+    });
+});
